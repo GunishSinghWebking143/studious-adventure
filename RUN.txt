@@ -1,0 +1,22 @@
+TUNEFUSION - RUN GUIDE
+
+1. Keep index.html, styles.css and app.js in the same folder.
+2. Open index.html in a modern browser.
+3. Click Explore music: it scrolls to the music catalogue.
+4. Search and choose All / Hindi / Punjabi to filter tracks.
+5. Click a song card to select it in the bottom player.
+6. To hear actual audio, edit app.js and put a valid, direct MP3 URL in that song's audioUrl.
+   You can also change the sample songs and their metadata in DEMO_SONGS.
+7. Login/signup in this HTML-only demo uses browser localStorage. It is for demonstration only,
+   not secure production authentication.
+
+MYSQL DATABASE
+1. Open MySQL Workbench or phpMyAdmin.
+2. Run schema.sql.
+3. This creates the tunefusion database and the users, songs and user_history tables.
+
+IMPORTANT LIMITATION
+A browser page made only with HTML, CSS and client-side JavaScript cannot connect securely
+to MySQL by itself. schema.sql creates the DBMS structure, but live database login, song
+loading and playback-history saving require a server-side API/backend. No backend language
+was requested, so this package runs as a front-end demo and provides the MySQL schema separately.
