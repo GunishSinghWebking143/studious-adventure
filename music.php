@@ -23,9 +23,9 @@ try {
   if ($source==='spotify') {
     $token=base64_encode($config['spotify_client_id'].':'.$config['spotify_client_secret']);
     $ch=curl_init('https://accounts.spotify.com/api/token');
-    curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,
+    curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_CAINFO=>__DIR__.'/cacert.pem',
       CURLOPT_POSTFIELDS=>'grant_type=client_credentials',CURLOPT_HTTPHEADER=>['Authorization: Basic '.$token,'Content-Type: application/x-www-form-urlencoded']]);
-    $raw=curl_exec($ch); curl_close($ch); $auth=json_decode($raw,true);
+    $raw=curl_exec($ch); $auth=json_decode($raw,true);
     if (empty($auth['access_token'])) throw new Exception('Spotify credentials are missing or invalid.');
     $data=http_get_json('https://api.spotify.com/v1/search?'.http_build_query(['q'=>$q,'type'=>'track','limit'=>10]),
       ['Authorization: Bearer '.$auth['access_token']]);
@@ -35,6 +35,18 @@ try {
       'id'=>$t['id'],'image'=>$t['album']['images'][1]['url'] ?? '',
       'embed'=>'https://open.spotify.com/embed/track/'.$t['id'],
       'url'=>$t['external_urls']['spotify'],'source'=>'spotify'];
+    out(['items'=>$items]);
+  }
+  if ($source==='itunes') {
+    $data=http_get_json('https://itunes.apple.com/search?'.http_build_query([
+      'term'=>$q,'media'=>'music','entity'=>'song','limit'=>10,'country'=>'US'
+    ]));
+    $items=[];
+    foreach (($data['results'] ?? []) as $t) {
+      $items[]=['title'=>$t['trackName'] ?? 'Untitled track','artist'=>$t['artistName'] ?? '',
+        'id'=>(string)($t['trackId'] ?? ''),'image'=>str_replace('100x100bb','600x600bb',$t['artworkUrl100'] ?? ''),
+        'embed'=>'','audio'=>$t['previewUrl'] ?? '','url'=>$t['trackViewUrl'] ?? '','source'=>'itunes'];
+    }
     out(['items'=>$items]);
   }
   if ($source==='jiosaavn') {
